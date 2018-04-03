@@ -11,9 +11,10 @@ export const addGroup = async (req, res) => {
     res.status(200).json(Group.format(newGroup)).end()
 }
 
-export const handleVote = async (req, res) => {
+export const handleVote = (io) => async (req, res) => {
     const { groupId } = req.params;
     const vote = req.body
+    let newVote;
     if (vote.id) {
         await Group.updateOne({
             _id: groupId,
@@ -21,12 +22,16 @@ export const handleVote = async (req, res) => {
         },
             { $set: { "votes.$.value": vote.value } },
             { upsert: true }, )
-        res.status(200).json(vote).end()
+        newVote = vote
     } else {
         const group = await Group.findByIdAndUpdate(groupId,
             { $push: { votes: { value: vote.value } } },
             { new: true }, )
         const { _id: id, value } = group.votes[group.votes.length - 1]
-        res.status(200).json({ id, value }).end()
+        newVote = { id, value }
     }
+    res.status(200).json(newVote).end()
+
+    const groups = await Group.find()
+    io.emit('VOTE', groups.map(Group.format))
 }

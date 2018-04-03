@@ -1,12 +1,14 @@
 import express from 'express'
+import socketIo from 'socket.io'
+import http from 'http'
 import webpack from 'webpack'
 import middleware from 'webpack-dev-middleware'
 import hotMiddleWare from 'webpack-hot-middleware'
+import { json } from 'body-parser'
 import './mongo'
 import { getGroups, addGroup, handleVote } from './mongo/controllers'
-import { json } from 'body-parser'
 
-const PORT = 3000;
+const PORT = process.env.PORT
 const compiler = webpack({
     mode: process.env.NODE_ENV,
     entry: './client/index.js',
@@ -28,6 +30,8 @@ const compiler = webpack({
         'webpack-hot-middleware/client']
 })
 const app = express();
+const server = http.createServer(app)
+const io = socketIo(server)
 
 app.use(middleware(compiler))
 app.use(hotMiddleWare(compiler))
@@ -41,6 +45,13 @@ app.get('/api/groups', getGroups)
 
 app.post('/api/groups', json(), addGroup)
 
-app.post('/api/groups/:groupId', json(), handleVote)
+app.post('/api/groups/:groupId', json(), handleVote(io))
 
-app.listen(PORT, () => { console.log(`Started on port ${PORT}`) })
+io.on("connection", socket => {
+    console.log('Client connected')
+    socket.on("disconnect", () => console.log("Client disconnected"));
+})
+
+server.listen(
+    //app.listen(
+    PORT, () => { console.log(`Started on port ${PORT}`) })

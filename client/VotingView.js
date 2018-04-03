@@ -4,6 +4,7 @@ import axios from 'axios'
 import GroupAdder from './GroupAdder'
 import GroupGraph from './GroupGraph'
 import { List, Segment, Select } from 'semantic-ui-react'
+import io from 'socket.io-client'
 
 const VOTE_ITEM = 'votes'
 const MAX_POINTS = 10
@@ -19,6 +20,8 @@ export default class VotingView extends Component {
         const { data: groups } = await axios.get('/api/groups')
         const votes = JSON.parse(localStorage.getItem(VOTE_ITEM)) || []
         this.setState({ groups, votes })
+        const socket = io(window.location.origin)
+        socket.on("VOTE", groups => this.setState({ groups }))
     }
 
     handleAddGroup = async (group) => {
