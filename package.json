@@ -1,0 +1,48 @@
+{
+  "name": "peerreview",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=production nodemon index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jami Kousa",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "body-parser": "^1.18.2",
+    "cross-env": "^5.1.4",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
+    "mongoose": "^5.0.12",
+    "nodemon": "^1.17.2",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "semantic-ui-react": "^0.79.0",
+    "uuid": "^3.2.1",
+    "webpack": "^4.4.1",
+    "webpack-dev-middleware": "^3.1.0",
+    "webpack-hot-middleware": "^2.21.2"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "dist/*",
+      "client/*"
+    ]
+  },
+  "babel": {
+    "presets": [
+      "env",
+      "react",
+      "stage-2"
+    ]
+  }
+}
