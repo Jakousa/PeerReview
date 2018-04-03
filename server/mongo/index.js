@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
+import { DB_URL } from '../../config'
 
-mongoose.connect(process.env.DB_URL)
+mongoose.connect(DB_URL)
 const db = mongoose.connection
 
 db.once('open', () => console.log('Connection established'))

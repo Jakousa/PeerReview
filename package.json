@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production nodemon index.js",
+    "start": "webpack --mode production && cross-env NODE_ENV=production node index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "stats": "webpack --mode production --json > stats.json"
   },
   "author": "Jami Kousa",
   "license": "ISC",
@@ -48,5 +49,8 @@
       "react",
       "stage-2"
     ]
+  },
+  "devDependencies": {
+    "webpack-cli": "^2.0.13"
   }
 }
