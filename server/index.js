@@ -3,7 +3,7 @@ import webpack from 'webpack'
 import middleware from 'webpack-dev-middleware'
 import hotMiddleWare from 'webpack-hot-middleware'
 import './mongo'
-import { getGroups, addGroup } from './mongo/controllers'
+import { getGroups, addGroup, handleVote } from './mongo/controllers'
 import { json } from 'body-parser'
 
 const PORT = 3000;
@@ -40,5 +40,7 @@ app.get('/', (req, res) => {
 app.get('/api/groups', getGroups)
 
 app.post('/api/groups', json(), addGroup)
+
+app.post('/api/groups/:groupId', json(), handleVote)
 
 app.listen(PORT, () => { console.log(`Started on port ${PORT}`) })

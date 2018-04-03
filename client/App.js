@@ -36,8 +36,8 @@ export default class App extends Component {
         <Container>
             <Form>
                 <Form.Input size='massive' label='Name' placeholder='First name' onChange={this.handleChange} />
+                <Form.Button size='massive' onClick={this.handleLogin} type='submit' color="orange">Login</Form.Button>
             </Form>
-            <Form.Button size='massive' onClick={this.handleLogin} color="orange">Login</Form.Button>
         </Container>
     )
 
