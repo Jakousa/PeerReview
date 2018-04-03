@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import axios from 'axios'
 
 import GroupAdder from './GroupAdder'
+import GroupGraph from './GroupGraph'
 import { List, Segment, Select } from 'semantic-ui-react'
 
 const VOTE_ITEM = 'votes'
@@ -110,6 +111,9 @@ export default class VotingView extends Component {
                 Review the groups, you have {points} point{points !== 1 ? 's' : ''} left to give:
                 {this.groupList()}
                 <GroupAdder addGroup={this.handleAddGroup} />
+                <Segment>
+                    <GroupGraph groups={this.state.groups} />
+                </Segment>
             </Segment>
         )
     }
