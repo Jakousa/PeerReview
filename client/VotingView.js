@@ -79,32 +79,29 @@ export default class VotingView extends Component {
         return pointOptions
     }
 
-    groupList = () => {
-
-        return (
-            <List divided verticalAlign='middle'>
-                {this.state.groups.map(group => {
-                    return (
-                        <List.Item key={group.id}>
-                            <List.Content floated='right'>
-                                <Select
-                                    placeholder='Points'
-                                    onChange={this.vote(group.id)}
-                                    value={this.getGroupValue(group.id)}
-                                    options={this.getOptions(group.id)}
-                                />
-                            </List.Content>
-                            <List.Icon name='gamepad' size='large' verticalAlign='middle' />
-                            <List.Content>
-                                <List.Header as='a'>{this.listHeader(group)}</List.Header>
-                                <List.Description as='a'>{group.members.join(' & ')}</List.Description>
-                            </List.Content>
-                        </List.Item>
-                    )
-                })}
-            </List>
-        )
-    }
+    groupList = () => (
+        <List divided verticalAlign='middle'>
+            {this.state.groups.sort((a, b) => this.listHeader(a) > this.listHeader(b)).map(group => {
+                return (
+                    <List.Item key={group.id}>
+                        <List.Content floated='right'>
+                            <Select
+                                placeholder='Points'
+                                onChange={this.vote(group.id)}
+                                value={this.getGroupValue(group.id)}
+                                options={this.getOptions(group.id)}
+                            />
+                        </List.Content>
+                        <List.Icon name='gamepad' size='large' verticalAlign='middle' />
+                        <List.Content>
+                            <List.Header as='a'>{this.listHeader(group)}</List.Header>
+                            <List.Description as='a'>{group.members.join(' & ')}</List.Description>
+                        </List.Content>
+                    </List.Item>
+                )
+            })}
+        </List>
+    )
 
     render = () => {
         console.log(this.state.groups)
@@ -114,7 +111,7 @@ export default class VotingView extends Component {
                 Review the groups, you have {points} point{points !== 1 ? 's' : ''} left to give:
                 {this.groupList()}
                 <GroupAdder addGroup={this.handleAddGroup} />
-                <Segment>
+                <Segment style={{ height: 400 }}>
                     <GroupGraph groups={this.state.groups} />
                 </Segment>
             </Segment>
