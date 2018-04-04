@@ -6,22 +6,26 @@ import GroupGraph from './GroupGraph'
 import { List, Segment, Select } from 'semantic-ui-react'
 import io from 'socket.io-client'
 
-const VOTE_ITEM = 'votes'
 const MAX_POINTS = 10
 
 export default class VotingView extends Component {
 
     state = {
         groups: [],
-        votes: []
     }
+
+    socket = undefined
 
     componentDidMount = async () => {
         const { data: groups } = await axios.get('/api/groups')
-        const votes = JSON.parse(localStorage.getItem(VOTE_ITEM)) || []
-        this.setState({ groups, votes })
-        const socket = io(window.location.origin)
-        socket.on("VOTE", groups => this.setState({ groups }))
+        this.setState({ groups })
+        this.socket = io(window.location.origin)
+        this.socket.connect()
+        this.socket.on("VOTE", groups => this.setState({ groups }))
+    }
+
+    componentWillUnmount() {
+        this.socket.disconnect()
     }
 
     handleAddGroup = async (group) => {
@@ -30,7 +34,7 @@ export default class VotingView extends Component {
     }
 
     vote = groupId => async (e, { value }) => {
-        const oldVote = this.state.votes.find(vote => vote.groupId === groupId)
+        const oldVote = this.props.votes.find(vote => vote.groupId === groupId)
         let id
         if (oldVote) {
             const { data: updatedVote } = await axios.post(`/api/groups/${groupId}`, { id: oldVote.id, value })
@@ -39,8 +43,8 @@ export default class VotingView extends Component {
             const { data: voteWithId } = await axios.post(`/api/groups/${groupId}`, { value })
             id = voteWithId.id
         }
-        const votes = [...this.state.votes.filter(vote => vote.groupId !== groupId), { groupId, value, id }]
-        this.setState({ votes }, localStorage.setItem(VOTE_ITEM, JSON.stringify(votes)))
+        const votes = [...this.props.votes.filter(vote => vote.groupId !== groupId), { groupId, value, id }]
+        this.props.changeVote(votes)
     }
 
     listHeader = (group) => {
@@ -57,10 +61,10 @@ export default class VotingView extends Component {
         return header
     }
 
-    remainingPoints = () => this.state.votes.reduce((prev, cur) => prev - cur.value, MAX_POINTS)
+    remainingPoints = () => this.props.votes.reduce((prev, cur) => prev - cur.value, MAX_POINTS)
 
     getGroupValue = groupId => {
-        const vote = this.state.votes.find(vote => vote.groupId === groupId)
+        const vote = this.props.votes.find(vote => vote.groupId === groupId)
         return vote ? vote.value : 0
     }
 
