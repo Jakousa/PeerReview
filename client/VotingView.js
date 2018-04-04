@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import GroupAdder from './GroupAdder'
 import GroupGraph from './GroupGraph'
-import { List, Segment, Select } from 'semantic-ui-react'
+import { List, Segment, Select, Dimmer, Loader } from 'semantic-ui-react'
 import io from 'socket.io-client'
 
 const MAX_POINTS = 10
@@ -12,6 +12,8 @@ export default class VotingView extends Component {
 
     state = {
         groups: [],
+        selectedGroup: undefined,
+        openOptions: { id: undefined, value: 0 }
     }
 
     socket = undefined
@@ -30,7 +32,7 @@ export default class VotingView extends Component {
 
     handleAddGroup = async (group) => {
         const { data: newGroup } = await axios.post('/api/groups', group)
-        this.setState({ groups: [...this.state.groups, newGroup] })
+        this.setState({ groups: [...this.state.groups.filter(group => group.id !== newGroup.id), newGroup], selectedGroup: undefined })
     }
 
     vote = groupId => async (e, { value }) => {
@@ -83,9 +85,24 @@ export default class VotingView extends Component {
         return pointOptions
     }
 
+    clearSelect = () => this.setState({ selectedGroup: undefined })
+
+    selectGroup = groupId => () => {
+        const { id, value } = this.state.openOptions
+        if (id === groupId) {
+            if (value > 3) {
+                this.setState({ selectedGroup: this.state.groups.find(group => group.id === groupId) })
+            } else {
+                this.setState({ openOptions: { id, value: value + 1 } })
+            }
+        } else {
+            this.setState({ openOptions: { id: groupId, value: 1 } })
+        }
+    }
+
     groupList = () => (
         <List divided verticalAlign='middle'>
-            {this.state.groups.sort((a, b) => this.listHeader(a) > this.listHeader(b)).map(group => {
+            {this.state.groups.sort((a, b) => this.listHeader(a).localeCompare(this.listHeader(b))).map(group => {
                 return (
                     <List.Item key={group.id}>
                         <List.Content floated='right'>
@@ -98,8 +115,8 @@ export default class VotingView extends Component {
                         </List.Content>
                         <List.Icon name='gamepad' size='large' verticalAlign='middle' />
                         <List.Content>
-                            <List.Header as='a'>{this.listHeader(group)}</List.Header>
-                            <List.Description as='a'>{group.members.join(' & ')}</List.Description>
+                            <List.Header as='a' onClick={this.selectGroup(group.id)}>{this.listHeader(group)}</List.Header>
+                            <List.Description>{group.members.join(' & ')}</List.Description>
                         </List.Content>
                     </List.Item>
                 )
@@ -108,13 +125,15 @@ export default class VotingView extends Component {
     )
 
     render = () => {
-        console.log(this.state.groups)
         const points = this.remainingPoints();
         return (
             <Segment>
+                <Dimmer active={!this.state.groups.length}>
+                    <Loader>Loading</Loader>
+                </Dimmer>
                 Review the groups, you have {points} point{points !== 1 ? 's' : ''} left to give:
                 {this.groupList()}
-                <GroupAdder addGroup={this.handleAddGroup} />
+                <GroupAdder addGroup={this.handleAddGroup} group={this.state.selectedGroup} clearSelect={this.clearSelect} />
                 <Segment style={{ height: 400 }}>
                     <GroupGraph groups={this.state.groups} />
                 </Segment>

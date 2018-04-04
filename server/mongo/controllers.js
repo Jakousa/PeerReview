@@ -6,8 +6,13 @@ export const getGroups = async (req, res) => {
 }
 
 export const addGroup = async (req, res) => {
-    const { groupName, projectTitle, members } = req.body
-    const newGroup = await Group.create({ groupName, projectTitle, members })
+    const { groupName, projectTitle, members, groupId } = req.body
+    let newGroup
+    if (!groupId) {
+        newGroup = await Group.create({ groupName, projectTitle, members })
+    } else {
+        newGroup = await Group.findByIdAndUpdate(groupId, { groupName, projectTitle, members }, { new: true })
+    }
     res.status(200).json(Group.format(newGroup)).end()
 }
 

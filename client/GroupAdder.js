@@ -13,7 +13,14 @@ const INITIAL_STATE = {
 export default class GroupAdder extends Component {
     state = INITIAL_STATE
 
-    toggleOpen = () => this.setState({ ...INITIAL_STATE, open: !this.state.open })
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.group) {
+            const { groupName, projectTitle, members } = nextProps.group
+            this.setState({ open: true, groupName, projectTitle, members })
+        }
+    }
+
+    toggleOpen = () => this.setState({ ...INITIAL_STATE, open: !this.state.open }, this.props.clearSelect())
 
     handleChange = (e, { name, value }) => this.setState({ [name]: value, error: '' })
 
@@ -36,7 +43,11 @@ export default class GroupAdder extends Component {
         } else if (members.length === 0) {
             this.setState({ error: 'Add atleast 1 member!' })
         } else {
-            this.props.addGroup({ groupName, projectTitle, members })
+            if (this.props.group) {
+                this.props.addGroup({ groupName, projectTitle, members, groupId: this.props.group.id })
+            } else {
+                this.props.addGroup({ groupName, projectTitle, members })
+            }
             this.toggleOpen()
         }
     }
@@ -72,7 +83,9 @@ export default class GroupAdder extends Component {
                         </Button>
                     </Form.Input>
                     <Form.Group floated="right">
-                        <Form.Button inverted width={16} fluid color="orange" onClick={this.addGroup}>Add group</Form.Button>
+                        <Form.Button inverted width={16} fluid color="orange" onClick={this.addGroup}>
+                            {this.props.group ? 'Edit group' : 'Add group'}
+                        </Form.Button>
                         <Form.Button inverted color="purple" onClick={this.toggleOpen}>Cancel</Form.Button>
                     </Form.Group>
                     {formError ?
