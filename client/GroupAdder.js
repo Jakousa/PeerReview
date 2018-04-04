@@ -39,7 +39,7 @@ export default class GroupAdder extends Component {
     addGroup = () => {
         const { members, groupName, projectTitle } = this.state
         if (!groupName && !projectTitle) {
-            this.setState({ error: 'Add either project title OR group name!' })
+            this.setState({ error: 'Add either project title OR team name!' })
         } else if (members.length === 0) {
             this.setState({ error: 'Add atleast 1 member!' })
         } else {
@@ -59,7 +59,7 @@ export default class GroupAdder extends Component {
                 <Form inverted error>
                     <Form.Group widths='equal'>
                         <Form.Input fluid label='Project title' placeholder='Project title' name={'projectTitle'} value={projectTitle} onChange={this.handleChange} />
-                        <Form.Input fluid label='Group name' placeholder='Group name' name={'groupName'} value={groupName} onChange={this.handleChange} />
+                        <Form.Input fluid label='Team name' placeholder='Team name' name={'groupName'} value={groupName} onChange={this.handleChange} />
                     </Form.Group>
                     <label> Members: </label>
                     <List divided relaxed horizontal inverted>
@@ -84,7 +84,7 @@ export default class GroupAdder extends Component {
                     </Form.Input>
                     <Form.Group floated="right">
                         <Form.Button inverted width={16} fluid color="orange" onClick={this.addGroup}>
-                            {this.props.group ? 'Edit group' : 'Add group'}
+                            {this.props.group ? 'Edit team' : 'Add team'}
                         </Form.Button>
                         <Form.Button inverted color="purple" onClick={this.toggleOpen}>Cancel</Form.Button>
                     </Form.Group>
@@ -101,7 +101,7 @@ export default class GroupAdder extends Component {
 
     renderButton = () => (
         <Button color="orange" onClick={this.toggleOpen}>
-            Group is missing?
+            Team is missing?
         </Button>
     )
 

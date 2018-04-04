@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ResponsiveContainer, Cell, BarChart, XAxis, Tooltip, Bar } from 'recharts'
+import { ResponsiveContainer, Cell, BarChart, XAxis, Tooltip, Bar, Text, LabelList } from 'recharts'
 
 // string to colour from https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
 const stringToColour = (str) => {
@@ -35,6 +35,8 @@ const GroupGraph = ({ groups }) => {
                 data={chartData}
             >
                 <Bar dataKey="score" fill="navy" >
+                    <LabelList dataKey="name" position="bottom" />
+
                     {chartData.map(bar => (
                         <Cell
                             key={bar.name}
@@ -42,7 +44,7 @@ const GroupGraph = ({ groups }) => {
                         />
                     ))}
                 </Bar>
-                <XAxis dataKey="name" />
+                <XAxis dataKey="name" tick={false} />
                 <Tooltip />
             </BarChart>
         </ResponsiveContainer>

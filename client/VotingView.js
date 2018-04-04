@@ -131,7 +131,7 @@ export default class VotingView extends Component {
                 <Dimmer active={!this.state.groups.length}>
                     <Loader>Loading</Loader>
                 </Dimmer>
-                Review the groups, you have {points} point{points !== 1 ? 's' : ''} left to give:
+                Review the teams, you have {points} point{points !== 1 ? 's' : ''} left to give:
                 {this.groupList()}
                 <GroupAdder addGroup={this.handleAddGroup} group={this.state.selectedGroup} clearSelect={this.clearSelect} />
                 <Segment style={{ height: 400 }}>
