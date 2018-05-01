@@ -1,17 +1,20 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import uuidv4 from 'uuid/v4'
 import { Container, Form, Button, Segment } from 'semantic-ui-react'
-import VotingView from './VotingView'
+
+import VotingView from './ResultView'
+import { disconnectSocket } from './util/apiConnection'
 
 const LOGIN_ITEM = 'users'
-const VOTE_ITEM = 'votes'
 
 const INITIAL_STATE = {
     possibleUsers: [],
-    user: { username: '', votes: [] },
+    user: { username: '', id: uuidv4() },
     loggedIn: false
 }
 
-export default class App extends Component {
+class App extends Component {
     state = INITIAL_STATE
 
     componentDidMount() {
@@ -21,32 +24,32 @@ export default class App extends Component {
         }
     }
 
+    componentWillUnmount() {
+        disconnectSocket()
+    }
+
     handleChange = (e, { value: username }) => this.setState({ user: { ...this.state.user, username } })
 
     handleRegister = () => {
         const { user } = this.state
         if (user.username) {
+            localStorage.setItem(LOGIN_ITEM, JSON.stringify([...this.state.possibleUsers, user]))
             this.setState({ loggedIn: true, user })
-            localStorage.setItem(LOGIN_ITEM, JSON.stringify([...this.state.possibleUsers, user.username]))
+            this.props.login()
         }
     }
 
     handleLogin = uname => () => {
-        const username = this.state.possibleUsers.find(username => uname === username)
-        if (username) {
-            const votes = JSON.parse(localStorage.getItem(`${username}_${VOTE_ITEM}`.toLowerCase())) || []
-            this.setState({ user: { username, votes }, loggedIn: true })
+        const user = this.state.possibleUsers.find(user => uname === user.username)
+        if (user) {
+            this.setState({ user: user, loggedIn: true })
+            this.props.login(user)
         }
     }
 
     handleLogout = () => {
         const possibleUsers = JSON.parse(localStorage.getItem(LOGIN_ITEM)) || []
         this.setState({ ...INITIAL_STATE, possibleUsers })
-    }
-
-    changeVote = votes => {
-        this.setState({ user: { ...this.state.user, votes } })
-        localStorage.setItem(`${this.state.user.username}_${VOTE_ITEM}`.toLowerCase(), JSON.stringify(votes))
     }
 
     clearStorage = () => this.setState(INITIAL_STATE, () => localStorage.clear())
@@ -59,8 +62,8 @@ export default class App extends Component {
             </Form>
             {this.state.possibleUsers.length ? (
                 <Segment inverted>
-                    {this.state.possibleUsers.map(username =>
-                        <Button inverted key={username} onClick={this.handleLogin(username)}> Login as {username}</Button>
+                    {this.state.possibleUsers.map(user =>
+                        <Button inverted key={user.id} onClick={this.handleLogin(user.username)}> Login as {user.username}</Button>
                     )}
                     <Button color='purple' floated='right' onClick={this.clearStorage}> Clear cache (cannot change votes) </Button>
                 </Segment>) : null
@@ -72,9 +75,16 @@ export default class App extends Component {
     renderDefault = () => (
         <Container>
             <h1> Hello {this.state.user.username} <Button floated="right" onClick={this.handleLogout} color="purple">Logout</Button></h1>
-            <VotingView changeVote={this.changeVote} votes={this.state.user.votes} />
+            <VotingView />
         </Container>
     )
 
     render = () => this.state.loggedIn ? this.renderDefault() : this.renderLogin()
 }
+
+const mapDispatchToProps = dispatch => ({
+    login: user => dispatch({ type: 'LOGIN_SUCCESS', user })
+})
+
+
+export default connect(null, mapDispatchToProps)(App)

@@ -5,7 +5,12 @@ const groupSchema = new Schema({
     projectTitle: String,
     members: [String],
     votes: [{
+        voter: String,
         value: Number
+    }],
+    feedback: [{
+        voter: String,
+        text: String
     }]
 })
 
