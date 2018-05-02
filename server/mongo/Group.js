@@ -16,14 +16,15 @@ const groupSchema = new Schema({
 
 groupSchema.statics.format = (group) => {
     const {
-        _id: id, groupName, projectTitle, members, votes
+        _id: id, groupName, projectTitle, members, votes, feedback
     } = group
     return {
         id,
         groupName,
         projectTitle,
         members,
-        votes
+        votes,
+        feedback
     }
 }
 const Group = mongoose.model('Group', groupSchema)

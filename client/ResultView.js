@@ -1,17 +1,19 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import axios from 'axios'
-import { List, Segment, Select, Dimmer, Loader, Button } from 'semantic-ui-react'
+import { List, Segment, Select, Dimmer, Loader, Button, Sidebar } from 'semantic-ui-react'
 
 import { getGroups, createGroup, vote, selectGroup } from './util/reducers'
 import GroupAdder from './GroupAdder'
 import GroupGraph from './GroupGraph'
+import SettingsSidebar from './SettingsSidebar'
 import { listHeader, getVotingOptions } from './util/common'
 
 class ResultView extends Component {
 
     state = {
-        selectedGroup: undefined
+        selectedGroup: undefined,
+        settings: undefined
     }
 
     componentDidMount = () => {
@@ -38,7 +40,11 @@ class ResultView extends Component {
 
     clearEdit = () => this.setState({ selectedGroup: undefined })
 
-    openEditGroup = groupId => () => this.setState({ selectedGroup: this.props.groups.find(group => group.id === groupId) })
+    openEditGroup = () => this.setState({ selectedGroup: this.state.settings, settings: undefined })
+
+    openSettings = groupId => () => this.setState({ settings: this.props.groups.find(group => group.id === groupId) })
+
+    closeSettings = () => this.setState({ settings: undefined })
 
     groupList = () => (
         <List divided verticalAlign='middle'>
@@ -49,7 +55,7 @@ class ResultView extends Component {
                             {this.props.user.username === 'Monitor' ?
                                 <Button color="orange" onClick={this.selectGroup(group.id)}> Select </Button>
                                 : null}
-                            <Button inverted color="purple" onClick={this.openEditGroup(group.id)}> Edit </Button>
+                            <Button inverted color="purple" onClick={this.openSettings(group.id)}> Edit </Button>
                             <Select
                                 placeholder='Points'
                                 onChange={this.vote(group.id)}
@@ -70,19 +76,22 @@ class ResultView extends Component {
 
     render = () => {
         return (
-            <Segment>
-                <Dimmer active={!this.props.groups.length}>
-                    <Loader>Loading</Loader>
-                </Dimmer>
-                {this.groupList()}
-                <GroupAdder group={this.state.selectedGroup} clearSelect={this.clearEdit} />
-                {this.props.user.username === 'Monitor' ?
-                    <Button color="orange" onClick={this.selectGroup(-1)}> Clear selected group </Button> : null
-                }
-                <Segment style={{ height: 400 }}>
-                    <GroupGraph />
-                </Segment>
-            </Segment>
+            <Sidebar.Pushable as={Segment} >
+                <SettingsSidebar editGroup={this.openEditGroup} group={this.state.settings} close={this.closeSettings} />
+                <Sidebar.Pusher style={{ margin: '2%' }}>
+                    <Dimmer active={!this.props.groups.length}>
+                        <Loader>Loading</Loader>
+                    </Dimmer>
+                    {this.groupList()}
+                    <GroupAdder group={this.state.selectedGroup} clearSelect={this.clearEdit} />
+                    {this.props.user.username === 'Monitor' ?
+                        <Button color="orange" onClick={this.selectGroup(-1)}> Clear selected group </Button> : null
+                    }
+                    <Segment style={{ height: 400 }}>
+                        <GroupGraph />
+                    </Segment>
+                </Sidebar.Pusher>
+            </Sidebar.Pushable>
         )
     }
 }

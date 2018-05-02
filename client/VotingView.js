@@ -81,7 +81,7 @@ class VotingView extends Component {
                                 <b> Feedback </b>
                                 <Form>
                                     <Form.TextArea value={this.state.feedback} onChange={this.handleChange} />
-                                    <Button color="orange" type="submit" onClick={this.sendFeedback}>Submit feedback</Button>
+                                    <Button color="orange" type="submit" disabled={this.state.sent} onClick={this.sendFeedback}>Submit feedback</Button>
                                 </Form>
                             </Grid.Column>
                         </Grid.Row>

@@ -1,4 +1,5 @@
 export const listHeader = (group) => {
+    if (!group) return ''
     let header = ''
     if (group.projectTitle) {
         header += group.projectTitle

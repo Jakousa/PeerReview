@@ -36,7 +36,7 @@ class App extends Component {
         if (user.username) {
             localStorage.setItem(LOGIN_ITEM, JSON.stringify([...this.state.possibleUsers, user]))
             this.setState({ loggedIn: true, user })
-            this.props.login()
+            this.props.login(user)
         }
     }
 
