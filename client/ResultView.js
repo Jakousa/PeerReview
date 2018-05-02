@@ -1,22 +1,25 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import axios from 'axios'
-import { getGroups, createGroup, vote } from './util/reducers'
+import { List, Segment, Select, Dimmer, Loader, Button } from 'semantic-ui-react'
 
+import { getGroups, createGroup, vote, selectGroup } from './util/reducers'
 import GroupAdder from './GroupAdder'
 import GroupGraph from './GroupGraph'
-import { List, Segment, Select, Dimmer, Loader } from 'semantic-ui-react'
+import { listHeader, getVotingOptions } from './util/common'
 
 class ResultView extends Component {
 
     state = {
-        groups: [],
-        selectedGroup: undefined,
-        openOptions: { id: undefined, value: 0 }
+        selectedGroup: undefined
     }
 
     componentDidMount = () => {
         this.props.getGroups()
+    }
+
+    selectGroup = groupId => () => {
+        this.props.selectGroup(groupId)
     }
 
     vote = groupId => (e, { value }) => {
@@ -28,39 +31,14 @@ class ResultView extends Component {
         this.props.vote(groupId, vote)
     }
 
-    listHeader = (group) => {
-        let header = ''
-        if (group.projectTitle) {
-            header += group.projectTitle
-        }
-        if (group.projectTitle && group.groupName) {
-            header += ', by '
-        }
-        if (group.groupName) {
-            header += group.groupName
-        }
-        return header
-    }
-
     getGroupValue = groupId => {
         const vote = this.props.groups.find(group => group.id === groupId).votes.find(vote => vote.voter === this.props.user.id)
         return vote ? vote.value : 0
     }
 
-    clearSelect = () => this.setState({ selectedGroup: undefined })
+    clearEdit = () => this.setState({ selectedGroup: undefined })
 
-    selectGroup = groupId => () => {
-        const { id, value } = this.state.openOptions
-        if (id === groupId) {
-            if (value > 3) {
-                this.setState({ selectedGroup: this.props.groups.find(group => group.id === groupId) })
-            } else {
-                this.setState({ openOptions: { id, value: value + 1 } })
-            }
-        } else {
-            this.setState({ openOptions: { id: groupId, value: 1 } })
-        }
-    }
+    openEditGroup = groupId => () => this.setState({ selectedGroup: this.props.groups.find(group => group.id === groupId) })
 
     groupList = () => (
         <List divided verticalAlign='middle'>
@@ -68,16 +46,20 @@ class ResultView extends Component {
                 return (
                     <List.Item key={group.id}>
                         <List.Content floated='right'>
+                            {this.props.user.username === 'Monitor' ?
+                                <Button color="orange" onClick={this.selectGroup(group.id)}> Select </Button>
+                                : null}
+                            <Button inverted color="purple" onClick={this.openEditGroup(group.id)}> Edit </Button>
                             <Select
                                 placeholder='Points'
                                 onChange={this.vote(group.id)}
                                 value={this.getGroupValue(group.id)}
-                                options={[{ key: 1, value: 1, text: 1 }, { key: 0, value: 0, text: 0 }]}
+                                options={getVotingOptions()}
                             />
                         </List.Content>
                         <List.Icon name='gamepad' size='large' verticalAlign='middle' />
                         <List.Content>
-                            <List.Header as='a' onClick={this.selectGroup(group.id)}>{this.listHeader(group)}</List.Header>
+                            <List.Header as='a'>{listHeader(group)}</List.Header>
                             <List.Description>{group.members.join(' & ')}</List.Description>
                         </List.Content>
                     </List.Item>
@@ -93,7 +75,10 @@ class ResultView extends Component {
                     <Loader>Loading</Loader>
                 </Dimmer>
                 {this.groupList()}
-                <GroupAdder group={this.state.selectedGroup} clearSelect={this.clearSelect} />
+                <GroupAdder group={this.state.selectedGroup} clearSelect={this.clearEdit} />
+                {this.props.user.username === 'Monitor' ?
+                    <Button color="orange" onClick={this.selectGroup(-1)}> Clear selected group </Button> : null
+                }
                 <Segment style={{ height: 400 }}>
                     <GroupGraph />
                 </Segment>
@@ -103,14 +88,15 @@ class ResultView extends Component {
 }
 
 const mapStateToProps = ({ groups, user }) => ({
-    groups,
+    groups: groups.sort((a, b) => listHeader(a).localeCompare(listHeader(b))),
     user
 })
 
 const mapDispatchToProps = dispatch => ({
     getGroups: () => dispatch(getGroups()),
     createGroup: group => dispatch(createGroup(group)),
-    vote: (groupId, value) => dispatch(vote(groupId, value))
+    vote: (groupId, value) => dispatch(vote(groupId, value)),
+    selectGroup: groupId => dispatch(selectGroup(groupId))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ResultView)

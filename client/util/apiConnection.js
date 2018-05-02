@@ -52,10 +52,13 @@ let socket
 export const socketToStore = store => {
     socket = io(window.location.origin)
     socket.connect()
-    socket.on("VOTE", groups => {
+    socket.on("GROUPS", groups => {
         store.dispatch({ type: 'GET_GROUPS_SUCCESS', response: groups })
+    })
+    socket.on("SELECT", selectedGroup => {
+        store.dispatch({ type: 'GET_SELECTED_SUCCESS', response: selectedGroup })
     })
 }
 export const disconnectSocket = () => {
-    this.socket.disconnect()
+    socket.disconnect()
 }

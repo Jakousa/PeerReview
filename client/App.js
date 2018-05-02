@@ -4,6 +4,7 @@ import uuidv4 from 'uuid/v4'
 import { Container, Form, Button, Segment } from 'semantic-ui-react'
 
 import ResultView from './ResultView'
+import VotingView from './VotingView'
 import { disconnectSocket } from './util/apiConnection'
 
 const LOGIN_ITEM = 'users'
@@ -75,16 +76,18 @@ class App extends Component {
     renderDefault = () => (
         <Container>
             <h1> Hello {this.state.user.username} <Button floated="right" onClick={this.handleLogout} color="purple">Logout</Button></h1>
-            <ResultView />
+            {this.state.user.username === 'Monitor' || this.props.selectedGroup.id === "-1" ? <ResultView /> : <VotingView />}
         </Container>
     )
 
     render = () => this.state.loggedIn ? this.renderDefault() : this.renderLogin()
 }
 
+const mapStateToProps = ({ selectedGroup }) => ({ selectedGroup })
+
 const mapDispatchToProps = dispatch => ({
     login: user => dispatch({ type: 'LOGIN_SUCCESS', user })
 })
 
 
-export default connect(null, mapDispatchToProps)(App)
+export default connect(mapStateToProps, mapDispatchToProps)(App)

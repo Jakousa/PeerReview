@@ -26,7 +26,7 @@ const barName = (group) => {
 const groupsToValidData = groups => groups.map(group => ({
     name: barName(group),
     score: group.votes.reduce((prev, cur) => cur.value + prev, 0)
-})).sort((a, b) => b.score - a.score)
+})).filter(group => group.score).sort((a, b) => b.score - a.score)
 
 const GroupGraph = ({ chartData }) => (
     <ResponsiveContainer>

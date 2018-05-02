@@ -5,7 +5,7 @@ export const getGroups = async (req, res) => {
     res.json(groups.map(Group.format)).status(200)
 }
 
-export const addGroup = async (req, res) => {
+export const addGroup = io => async (req, res) => {
     const { groupName, projectTitle, members, groupId } = req.body
     let newGroup
     if (!groupId) {
@@ -14,6 +14,9 @@ export const addGroup = async (req, res) => {
         newGroup = await Group.findByIdAndUpdate(groupId, { groupName, projectTitle, members }, { new: true })
     }
     res.json(Group.format(newGroup)).status(200)
+
+    const groups = await Group.find()
+    io.emit('GROUPS', groups.map(Group.format))
 }
 
 export const handleVote = (io) => async (req, res) => {
@@ -40,5 +43,42 @@ export const handleVote = (io) => async (req, res) => {
     res.json({ vote: newVote, groupId }).status(200)
 
     const groups = await Group.find()
-    io.emit('VOTE', groups.map(Group.format))
+    io.emit('GROUPS', groups.map(Group.format))
+}
+
+const selectedGroup = { id: "-1" }
+
+export const getSelectedGroup = async (req, res) => {
+    if (!selectedGroup.id) {
+        return res.status(204).end()
+    }
+    return res.json(selectedGroup).status(200)
+}
+
+export const selectGroup = (io) => async (req, res) => {
+    const { groupId } = req.params
+    if (!groupId) {
+        return res.status(400).end()
+    }
+    selectedGroup.id = groupId
+    res.status(202).end()
+
+    io.emit('SELECT', selectedGroup)
+}
+
+export const handleFeedback = (io) => async (req, res) => {
+    const { groupId } = req.params
+    const userId = req.headers.user
+    const feedback = req.body
+    if (!groupId) {
+        return res.status(400).end()
+    }
+    await Group.findByIdAndUpdate(groupId,
+        { $push: { feedback: { text: feedback.text, voter: userId } } },
+        { new: true }, )
+
+    res.status(202).end()
+
+    const groups = await Group.find()
+    io.emit('GROUPS', groups.map(Group.format))
 }

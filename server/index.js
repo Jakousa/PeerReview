@@ -6,7 +6,7 @@ import middleware from 'webpack-dev-middleware'
 import hotMiddleWare from 'webpack-hot-middleware'
 import { json } from 'body-parser'
 import './mongo'
-import { getGroups, addGroup, handleVote } from './mongo/controllers'
+import { getGroups, addGroup, handleVote, getSelectedGroup, selectGroup, handleFeedback } from './mongo/controllers'
 import { PORT, NODE_ENV } from '../config'
 import webpackConf from '../webpack.config'
 const app = express();
@@ -28,9 +28,15 @@ app.get('/', (req, res) => {
 
 app.get('/api/groups', getGroups)
 
-app.post('/api/groups', json(), addGroup)
+app.get('/api/groups/selected', getSelectedGroup)
 
-app.post('/api/groups/:groupId', json(), handleVote(io))
+app.get('/api/groups/:groupId', json(), selectGroup(io))
+
+app.post('/api/groups', json(), addGroup(io))
+
+app.post('/api/groups/:groupId/vote', json(), handleVote(io))
+
+app.post('/api/groups/:groupId/feedback', json(), handleFeedback(io))
 
 io.on("connection", socket => {
     console.log('Client connected')

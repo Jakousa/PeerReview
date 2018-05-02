@@ -14,11 +14,28 @@ export const createGroup = group => {
 }
 
 export const vote = (groupId, vote) => {
-    const route = `/groups/${groupId}`
+    const route = `/groups/${groupId}/vote`
     const prefix = 'VOTE_'
     return callController(route, prefix, vote, 'post')
 }
 
+export const getSelected = () => {
+    const route = `/groups/selected`
+    const prefix = 'GET_SELECTED_'
+    return callController(route, prefix)
+}
+
+export const selectGroup = groupId => {
+    const route = `/groups/${groupId}`
+    const prefix = 'SELECT_GROUP_'
+    return callController(route, prefix)
+}
+
+export const sendFeedback = (groupId, feedback) => {
+    const route = `/groups/${groupId}/feedback`
+    const prefix = 'SEND_FEEDBACK_'
+    return callController(route, prefix, { text: feedback }, 'post')
+}
 
 const groups = (state = [], action) => {
     switch (action.type) {
@@ -46,7 +63,17 @@ const user = (state = {}, action) => {
     }
 }
 
+const selectedGroup = (state = {}, action) => {
+    switch (action.type) {
+        case 'GET_SELECTED_SUCCESS':
+            return action.response
+        default:
+            return state
+    }
+}
+
 export default combineReducers({
     groups,
-    user
+    user,
+    selectedGroup
 })
