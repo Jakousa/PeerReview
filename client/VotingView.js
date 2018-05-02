@@ -20,7 +20,7 @@ class VotingView extends Component {
     }
 
     componentWillReceiveProps = (nextProps) => {
-        if (nextProps.group._id !== this.props.group._Id) {
+        if (this.props.group && nextProps.group.id !== this.props.group.id) {
             this.setState(INITIAL_STATE)
         }
     }
@@ -60,6 +60,7 @@ class VotingView extends Component {
                 </div>
             )
         }
+        const previousFeedback = group.feedback.find(feedback => feedback.voter === this.props.user.id)
         return (
             <Container>
                 <Segment>
@@ -91,6 +92,8 @@ class VotingView extends Component {
                                     <Form.TextArea value={this.state.feedback} onChange={this.handleChange} />
                                     <Button color="orange" type="submit" disabled={this.state.sent} onClick={this.sendFeedback}>Submit feedback</Button>
                                 </Form>
+                                Feedback given: {previousFeedback ? <Icon name='check' color='green' /> : <Icon name='close' color='red' />}
+                                {previousFeedback ? 'Thank you for your feedback' : null}
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>
