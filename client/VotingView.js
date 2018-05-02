@@ -6,15 +6,23 @@ import { Container, Grid, Segment, Select, Icon, Form, Button } from 'semantic-u
 import { getSelected, getGroups, vote, sendFeedback } from './util/reducers'
 import { listHeader, getVotingOptions } from './util/common'
 
+const INITIAL_STATE = {
+    feedback: '',
+    sent: false
+}
+
 class VotingView extends Component {
-    state = {
-        feedback: '',
-        sent: false
-    }
+    state = INITIAL_STATE
 
     componentDidMount() {
         this.props.getGroups()
         this.props.getSelected()
+    }
+
+    componentWillReceiveProps = (nextProps) => {
+        if (nextProps.group._id !== this.props.group._Id) {
+            this.setState(INITIAL_STATE)
+        }
     }
 
     handleChange = (e, { value }) => this.setState({ feedback: value })
