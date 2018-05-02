@@ -55,7 +55,7 @@ class ResultView extends Component {
                             {this.props.user.username === 'Monitor' ?
                                 <Button color="orange" onClick={this.selectGroup(group.id)}> Select </Button>
                                 : null}
-                            <Button inverted color="purple" onClick={this.openSettings(group.id)}> Edit </Button>
+                            <Button inverted color="orange" onClick={this.openSettings(group.id)}> More settings </Button>
                             <Select
                                 placeholder='Points'
                                 onChange={this.vote(group.id)}
