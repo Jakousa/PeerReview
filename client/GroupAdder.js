@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { Form, Button, Segment, Icon, List, Message } from 'semantic-ui-react'
+import { createGroup } from './util/reducers'
 
 const INITIAL_STATE = {
     open: false,
@@ -10,7 +12,7 @@ const INITIAL_STATE = {
     error: '',
 }
 
-export default class GroupAdder extends Component {
+class GroupAdder extends Component {
     state = INITIAL_STATE
 
     componentWillReceiveProps(nextProps) {
@@ -44,9 +46,9 @@ export default class GroupAdder extends Component {
             this.setState({ error: 'Add atleast 1 member!' })
         } else {
             if (this.props.group) {
-                this.props.addGroup({ groupName, projectTitle, members, groupId: this.props.group.id })
+                this.props.createGroup({ groupName, projectTitle, members, groupId: this.props.group.id })
             } else {
-                this.props.addGroup({ groupName, projectTitle, members })
+                this.props.createGroup({ groupName, projectTitle, members })
             }
             this.toggleOpen()
         }
@@ -107,3 +109,9 @@ export default class GroupAdder extends Component {
 
     render = () => this.state.open ? this.renderForm() : this.renderButton()
 }
+
+const mapDispatchToProps = dispatch => ({
+    createGroup: group => dispatch(createGroup(group))
+})
+
+export default connect(null, mapDispatchToProps)(GroupAdder)

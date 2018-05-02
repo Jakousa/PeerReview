@@ -19,13 +19,8 @@ class ResultView extends Component {
         this.props.getGroups()
     }
 
-    handleAddGroup = group => {
-        this.props.createGroup(group)
-    }
-
     vote = groupId => (e, { value }) => {
         const oldVote = this.props.groups.find(group => group.id === groupId).votes.find(vote => vote.voter === this.props.user.id)
-        console.log(oldVote, 'Wanha')
         const vote = { value }
         if (oldVote) {
             vote._id = oldVote._id
@@ -98,9 +93,9 @@ class ResultView extends Component {
                     <Loader>Loading</Loader>
                 </Dimmer>
                 {this.groupList()}
-                <GroupAdder addGroup={this.handleAddGroup} group={this.state.selectedGroup} clearSelect={this.clearSelect} />
+                <GroupAdder group={this.state.selectedGroup} clearSelect={this.clearSelect} />
                 <Segment style={{ height: 400 }}>
-                    <GroupGraph groups={this.props.groups} />
+                    <GroupGraph />
                 </Segment>
             </Segment>
         )

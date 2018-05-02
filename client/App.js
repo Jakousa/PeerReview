@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import uuidv4 from 'uuid/v4'
 import { Container, Form, Button, Segment } from 'semantic-ui-react'
 
-import VotingView from './ResultView'
+import ResultView from './ResultView'
 import { disconnectSocket } from './util/apiConnection'
 
 const LOGIN_ITEM = 'users'
@@ -75,7 +75,7 @@ class App extends Component {
     renderDefault = () => (
         <Container>
             <h1> Hello {this.state.user.username} <Button floated="right" onClick={this.handleLogout} color="purple">Logout</Button></h1>
-            <VotingView />
+            <ResultView />
         </Container>
     )
 

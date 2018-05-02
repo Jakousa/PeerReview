@@ -4,8 +4,7 @@ import io from 'socket.io-client'
 const getAxios = () => axios.create({ baseURL: '/api' })
 
 const callApi = async (url, method = 'get', data, user) => {
-    const options = {}
-    options.headers = { User: user.id }
+    const options = { headers: { User: user.id } }
     switch (method) {
         case 'get':
             return getAxios().get(url, options)
@@ -54,7 +53,7 @@ export const socketToStore = store => {
     socket = io(window.location.origin)
     socket.connect()
     socket.on("VOTE", groups => {
-        store.dispatch({ type: 'LOL WTF', response: groups })
+        store.dispatch({ type: 'GET_GROUPS_SUCCESS', response: groups })
     })
 }
 export const disconnectSocket = () => {
