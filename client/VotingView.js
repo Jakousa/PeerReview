@@ -104,7 +104,7 @@ class VotingView extends Component {
 }
 
 const mapStateToProps = ({ groups, selectedGroup, user }) => ({
-    group: groups.find(group => group.id === selectedGroup.id),
+    group: groups.data.find(group => group.id === selectedGroup.id),
     user
 })
 
