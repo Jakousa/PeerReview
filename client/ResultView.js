@@ -79,7 +79,7 @@ class ResultView extends Component {
             <Sidebar.Pushable as={Segment} >
                 <SettingsSidebar editGroup={this.openEditGroup} group={this.state.settings} close={this.closeSettings} />
                 <Sidebar.Pusher style={{ margin: '2%' }}>
-                    <Dimmer active={!this.props.groups.length}>
+                    <Dimmer active={this.props.loading}>
                         <Loader>Loading</Loader>
                     </Dimmer>
                     {this.groupList()}
@@ -97,7 +97,8 @@ class ResultView extends Component {
 }
 
 const mapStateToProps = ({ groups, user }) => ({
-    groups: groups.sort((a, b) => listHeader(a).localeCompare(listHeader(b))),
+    groups: groups.data.sort((a, b) => listHeader(a).localeCompare(listHeader(b))),
+    loading: groups.loading,
     user
 })
 

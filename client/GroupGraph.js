@@ -50,7 +50,7 @@ const GroupGraph = ({ chartData }) => (
 )
 
 const mapStateToProps = ({ groups }) => ({
-    chartData: groupsToValidData(groups)
+    chartData: groupsToValidData(groups.data)
 })
 
 export default connect(mapStateToProps)(GroupGraph)
